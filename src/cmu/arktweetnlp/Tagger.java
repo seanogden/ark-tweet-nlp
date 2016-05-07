@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import cmu.arktweetnlp.impl.Model;
@@ -53,6 +54,31 @@ public class Tagger {
 	/**
 	 * Run the tokenizer and tagger on one tweet's text.
 	 **/
+	public List<TaggedToken> justTag(List<String> tokens) {
+		if (model == null) throw new RuntimeException("Must loadModel() first before tagging anything");
+
+		Sentence sentence = new Sentence();
+		sentence.tokens = tokens;
+		ModelSentence ms = new ModelSentence(sentence.T());
+		featureExtractor.computeFeatures(sentence, ms);
+		model.greedyDecode(ms, false);
+
+		ArrayList<TaggedToken> taggedTokens = new ArrayList<TaggedToken>();
+
+		for (int t=0; t < sentence.T(); t++) {
+			TaggedToken tt = new TaggedToken();
+			tt.token = tokens.get(t);
+			tt.tag = model.labelVocab.name( ms.labels[t] );
+			taggedTokens.add(tt);
+		}
+
+		return taggedTokens;
+	}
+
+
+	/**
+	 * Run the tokenizer and tagger on one tweet's text.
+	 **/
 	public List<TaggedToken> tokenizeAndTag(String text) {
 		if (model == null) throw new RuntimeException("Must loadModel() first before tagging anything");
 		List<String> tokens = Twokenize.tokenizeRawTweetText(text);
@@ -89,7 +115,9 @@ public class Tagger {
 		tagger.loadModel(modelFilename);
 
 		String text = "RT @DjBlack_Pearl: wat muhfuckaz wearin 4 the lingerie party?????";
-		List<TaggedToken> taggedTokens = tagger.tokenizeAndTag(text);
+        List<String> txt = Arrays.asList(text.split("\\s+"));
+		//List<TaggedToken> taggedTokens = tagger.tokenizeAndTag(text);
+		List<TaggedToken> taggedTokens = tagger.justTag(txt);
 
 		for (TaggedToken token : taggedTokens) {
 			System.out.printf("%s\t%s\n", token.tag, token.token);

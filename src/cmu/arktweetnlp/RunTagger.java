@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Arrays;
 
 import cmu.arktweetnlp.impl.ModelSentence;
 import cmu.arktweetnlp.impl.Sentence;
@@ -119,7 +120,8 @@ public class RunTagger {
 			
 			Sentence sentence = new Sentence();
 			
-			sentence.tokens = Twokenize.tokenizeRawTweetText(text);
+			//sentence.tokens = Twokenize.tokenizeRawTweetText(text);
+			sentence.tokens = Arrays.asList(text.split("\\s+"));
 			ModelSentence modelSentence = null;
 
 			if (sentence.T() > 0 && !justTokenize) {
